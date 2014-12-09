@@ -2,14 +2,78 @@
 #include <font_5x4.h>
 #include <images.h>
 
+// https://learn.adafruit.com/multi-tasking-the-arduino-part-1/overview
+//
+
+class ImageRunner
+{
+  
+  int clk;
+  int cs;
+  int wr;
+  int data;
+  
+  int i = 0;
+  int j = 0;
+
+//  byte mIMG_TREE[16]  = {
+  //    0b00000000, 0b11001110, 0b00001001, 0b10011100, 0b00011011, 0b10111100, 0b00111111, 0b11111111, 0b11111111, 0b11111111, 0b00111111, 0b11111111, 0b00011011, 0b10111100, 0b00001001, 0b10011100, 0b00000000, 0b11001110
+  //};
+
+//  byte mIMG_BALLS[16]  = {
+  //    0b00000000, 0b01000010, 0b00001000, 0b00000000, 0b00000010, 0b10001000, 0b00100000, 0b00100000, 0b10001010, 0b00001000, 0b00100000, 0b00100000, 0b00000010, 0b10001000, 0b00001000, 0b00000000, 0b00000000, 0b01000010
+//  };
+
+  int mIMG_TREE_WIDTH = 9;
+  int mIMG_TREE_HEIGHT = 16;
+  
+  int  updateInterval = 150;      // interval between updates
+  unsigned long lastUpdate = 0; // last update of position
+  
+  public:
+  ImageRunner(int pClk, int pCs, int pWr, int pData) {
+    clk = pClk;
+    cs = pCs;
+    wr = pWr;
+    data = pData;
+    
+    
+  
+    
+  }
+  
+  void Attach() {
+  
+     HT1632.setCLK(clk);
+     HT1632.begin(cs, wr, data);
+  }
+  
+  void Update() {
+  if((millis() - lastUpdate) > updateInterval)  // time to update
+    {
+      lastUpdate = millis();
+      
+      
+    }
+
+  }
+    
+};
 int i = 0;
 int j = 0;
 
 
 
 const byte IMG_TREE [] PROGMEM = {
-0b00000000, 0b11001110, 0b00001001, 0b10011100, 0b00011011, 0b10111000, 0b00111111, 0b11111111, 0b11111111, 0b11111111, 0b00111111, 0b11111111, 0b00011011, 0b10111000, 0b00001001, 0b10011100, 0b00000000, 0b11001110
+0b00000000, 0b11001110, 0b00001001, 0b10011100, 0b00011011, 0b10111100, 0b00111111, 0b11111111, 0b11111111, 0b11111111, 0b00111111, 0b11111111, 0b00011011, 0b10111100, 0b00001001, 0b10011100, 0b00000000, 0b11001110
 };
+
+const byte IMG_BALLS [] PROGMEM = {
+0b00000000, 0b01000010, 0b00001000, 0b00000000, 0b00000010, 0b10001000, 0b00100000, 0b00100000, 0b10001010, 0b00001000, 0b00100000, 0b00100000, 0b00000010, 0b10001000, 0b00001000, 0b00000000, 0b00000000, 0b01000010
+};
+
+
+
 #define IMG_TREE_WIDTH 	 9
 #define IMG_TREE_HEIGHT  16
 
@@ -25,17 +89,19 @@ void loop () {
   HT1632.clear();
   
   if (~i & 0b01) { // On frames 1 and 3:
-    HT1632.selectChannel(0); // Select the first channel
+    HT1632.selectChannel(1); // Select the first channel
     // Draw a heart:
-    HT1632.drawImage(IMG_TREE, IMG_TREE_WIDTH,  IMG_TREE_HEIGHT, j - IMG_TREE_WIDTH, 0);
+    HT1632.drawImage(IMG_BALLS, IMG_TREE_WIDTH,  IMG_TREE_HEIGHT, j - IMG_TREE_WIDTH, 0);
   }
   
   if (~i & 0b10) { // On frames 2 and 3:
-    HT1632.selectChannel(1); // Select the second channel
+    HT1632.selectChannel(0); // Select the second channel
     // Draw a heart:
-    HT1632.drawImage(IMG_TREE, IMG_TREE_WIDTH,  IMG_TREE_HEIGHT, j - IMG_TREE_WIDTH, 0);
+    HT1632.drawImage(IMG_BALLS, IMG_TREE_WIDTH,  IMG_TREE_HEIGHT, j - IMG_TREE_WIDTH, 0);
   }
-  
+
+  HT1632.selectChannel(0); // Select the second channel
+  HT1632.drawImage(IMG_TREE, IMG_TREE_WIDTH,  IMG_TREE_HEIGHT, j - IMG_TREE_WIDTH, 0);
   HT1632.render(); // This sends the data in both channels to the screen.
 
   // Get the next number in the sequence, wrapping from 3 back to 0:
