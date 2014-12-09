@@ -1,112 +1,148 @@
-#include <HT1632.h>
+  #include <HT1632.h>
 #include <font_5x4.h>
 #include <images.h>
+#include "pitches.h"
 
 // https://learn.adafruit.com/multi-tasking-the-arduino-part-1/overview
 //
 
+
+
+class Tone {
+
+    // notes in the melody:
+    int melody[8] =   {NOTE_C4, NOTE_G3, NOTE_G3, NOTE_A3, NOTE_G3, NOTE_G3, NOTE_B3, NOTE_C4};
+
+    // note durations: 4 = quarter note, 8 = eighth note, etc.:
+    int noteDurations[8] =  {4, 8, 8, 4, 4, 4, 4, 4 };
+
+    int updateInterval = 0;      // interval between updates unsigned long
+    int lastUpdate = 0; // last update of position
+
+    int thisNote = 0;
+
+  public:
+    Tone(int i)
+    {
+    }
+
+
+    void Update() {
+      if ((millis() - lastUpdate) > updateInterval) // time to update
+      {
+        lastUpdate = millis();
+
+        if (thisNote < 7) {
+
+          noTone(9);
+          // to calculate the note duration, take one second
+          // divided by the note type.
+          //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+          int noteDuration = 1000 / noteDurations[thisNote];
+          tone(9, melody[thisNote], noteDuration);
+
+          // to distinguish the notes, set a minimum time between them.
+          // the note's duration + 30% seems to work well:
+          int pauseBetweenNotes = noteDuration * 1.30;
+          thisNote++;
+          updateInterval = 300;
+          // stop the tone playing:
+          //noTone(8);
+
+
+        } else {
+          thisNote = 0;
+        }
+      }
+
+    }
+
+};
+
+
 class ImageRunner
 {
-  
+
   int clk;
   int cs;
   int wr;
   int data;
-  
+
   int i = 0;
-  int j = 0;
 
-//  byte mIMG_TREE[16]  = {
-  //    0b00000000, 0b11001110, 0b00001001, 0b10011100, 0b00011011, 0b10111100, 0b00111111, 0b11111111, 0b11111111, 0b11111111, 0b00111111, 0b11111111, 0b00011011, 0b10111100, 0b00001001, 0b10011100, 0b00000000, 0b11001110
-  //};
 
-//  byte mIMG_BALLS[16]  = {
-  //    0b00000000, 0b01000010, 0b00001000, 0b00000000, 0b00000010, 0b10001000, 0b00100000, 0b00100000, 0b10001010, 0b00001000, 0b00100000, 0b00100000, 0b00000010, 0b10001000, 0b00001000, 0b00000000, 0b00000000, 0b01000010
-//  };
+  int wd;
+
+
+
+  const byte disp [20] = {'H', 'e', 'l', 'l', 'o', ',', ' ', 'h', 'o', 'w', ' ', 'a', 'r', 'e', ' ', 'y', 'o', 'u', '?'};
 
   int mIMG_TREE_WIDTH = 9;
   int mIMG_TREE_HEIGHT = 16;
-  
+
   int  updateInterval = 150;      // interval between updates
   unsigned long lastUpdate = 0; // last update of position
-  
+
   public:
-  ImageRunner(int pClk, int pCs, int pWr, int pData) {
-    clk = pClk;
-    cs = pCs;
-    wr = pWr;
-    data = pData;
-    
-    
-  
-    
+  ImageRunner(int i) {
+//    clk = pClk;
+clk = i;
+  //  cs = pCs;
+    //wr = pWr;
+//    data = pData;
+
+
+
+
   }
-  
+
   void Attach() {
-  
-     HT1632.setCLK(clk);
-     HT1632.begin(cs, wr, data);
+
+    HT1632.setCLK(4);
+    HT1632.begin(5, 6, 7);
+    wd = HT1632.getTextWidth(disp, FONT_5X4_END, FONT_5X4_HEIGHT);
+
+
   }
-  
+
   void Update() {
   if((millis() - lastUpdate) > updateInterval)  // time to update
     {
       lastUpdate = millis();
-      
-      
+//      HT1632.drawTarget(BUFFER_BOARD(1));
+      HT1632.clear();
+      HT1632.drawText(disp, OUT_SIZE - i, 2, FONT_5X4, FONT_5X4_END, FONT_5X4_HEIGHT);
+      HT1632.render();
+
+      i = (i+1)%(wd + OUT_SIZE);
+
+      updateInterval = 300;
+
     }
 
   }
-    
-};
-int i = 0;
-int j = 0;
 
-
-
-const byte IMG_TREE [] PROGMEM = {
-0b00000000, 0b11001110, 0b00001001, 0b10011100, 0b00011011, 0b10111100, 0b00111111, 0b11111111, 0b11111111, 0b11111111, 0b00111111, 0b11111111, 0b00011011, 0b10111100, 0b00001001, 0b10011100, 0b00000000, 0b11001110
-};
-
-const byte IMG_BALLS [] PROGMEM = {
-0b00000000, 0b01000010, 0b00001000, 0b00000000, 0b00000010, 0b10001000, 0b00100000, 0b00100000, 0b10001010, 0b00001000, 0b00100000, 0b00100000, 0b00000010, 0b10001000, 0b00001000, 0b00000000, 0b00000000, 0b01000010
 };
 
 
 
-#define IMG_TREE_WIDTH 	 9
-#define IMG_TREE_HEIGHT  16
+
+Tone playMusic(0);
+ImageRunner imageRunner(1);
 
 void setup () {
+
   // Working with Bicolor displays.
-  // Make sure that a bicolor display is set in HT1632.h  
-  HT1632.setCLK(4);
-  HT1632.begin(5, 6, 7);
+  // Make sure that a bicolor display is set in HT1632.h
+  //  HT1632.setCLK(4);
+  // HT1632.begin(5, 6, 7);
+
+  imageRunner.Attach();
+
 }
 
-void loop () {
-  // Zero all data in all channels:
-  HT1632.clear();
-  
-  if (~i & 0b01) { // On frames 1 and 3:
-    HT1632.selectChannel(1); // Select the first channel
-    // Draw a heart:
-    HT1632.drawImage(IMG_BALLS, IMG_TREE_WIDTH,  IMG_TREE_HEIGHT, j - IMG_TREE_WIDTH, 0);
-  }
-  
-  if (~i & 0b10) { // On frames 2 and 3:
-    HT1632.selectChannel(0); // Select the second channel
-    // Draw a heart:
-    HT1632.drawImage(IMG_BALLS, IMG_TREE_WIDTH,  IMG_TREE_HEIGHT, j - IMG_TREE_WIDTH, 0);
-  }
+void loop() {
 
-  HT1632.selectChannel(0); // Select the second channel
-  HT1632.drawImage(IMG_TREE, IMG_TREE_WIDTH,  IMG_TREE_HEIGHT, j - IMG_TREE_WIDTH, 0);
-  HT1632.render(); // This sends the data in both channels to the screen.
-
-  // Get the next number in the sequence, wrapping from 3 back to 0:
-  i = (i + 1) % 3;
-  j = (j + 1) % (OUT_SIZE + IMG_TREE_WIDTH * 2);
-  
-  delay(300);  
+    imageRunner.Update();
+  playMusic.Update();
 }
