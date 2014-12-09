@@ -8,8 +8,8 @@ int j = 0;
 void setup () {
   // Working with Bicolor displays.
   // Make sure that a bicolor display is set in HT1632.h  
-  HT1632.setCLK(5);
-  HT1632.begin(4, 6, 7);
+  HT1632.setCLK(4);
+  HT1632.begin(5, 6, 7);
 }
 
 void loop () {
