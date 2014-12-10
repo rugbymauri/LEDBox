@@ -25,6 +25,7 @@ void setup () {
   // hh:mm:ss :
   if (!date.running())  {
     date.begin("date");
+  //  date.addParameter("+%H:%M");
     date.addParameter("+%T");
     date.run();
   }
@@ -35,6 +36,7 @@ void loop () {
   // restart the date process:
     if (!date.running())  {
       date.begin("date");
+//      date.addParameter("+%H:%M");
       date.addParameter("+%T");
       date.run();
     }
@@ -44,7 +46,7 @@ void loop () {
   timeString.toCharArray((char*)disp,10); 
   //HT1632.drawTarget(BUFFER_BOARD(1));
   HT1632.clear();
-  HT1632.drawText(disp, 0, 0, FONT_8X4, FONT_CLOCK_END, FONT_CLOCK_HEIGHT);
+  HT1632.drawText(disp, 0, 0, FONT_CLOCK, FONT_CLOCK_END, FONT_CLOCK_HEIGHT);
   HT1632.render();
   
   //i = (i+1)%(wd + OUT_SIZE);
