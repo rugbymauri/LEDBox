@@ -33,3 +33,8 @@ Pin 2 - Button Black
 
 Pin 9 - Speaker
 
+
+Docs
+http://playground.arduino.cc/Main/HT1632C
+
+

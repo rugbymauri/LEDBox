@@ -25,7 +25,7 @@ void setup () {
   // hh:mm:ss :
   if (!date.running())  {
     date.begin("date");
-  //  date.addParameter("+%H:%M");
+//    date.addParameter("+%H:%M");
     date.addParameter("+%T");
     date.run();
   }
