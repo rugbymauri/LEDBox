@@ -1,4 +1,4 @@
-  #include <HT1632.h>
+#include <HT1632.h>
 #include <font_5x4.h>
 #include <images.h>
 #include "pitches.h"
@@ -144,5 +144,5 @@ void setup () {
 void loop() {
 
     imageRunner.Update();
-  playMusic.Update();
+    playMusic.Update();
 }
