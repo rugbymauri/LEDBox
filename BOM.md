@@ -7,7 +7,7 @@ Bill of Material
 - 1 100Ohm Resistor for the Speacker
 - 6 Buttons
 - 6 10kOhm Resistors
-- 1 Powersupply 5V, min. 700mA (ex. old Smartphone Charger)
+- 1 Powersupply 5V,+700mA (ex. old Smartphone Charger)
 - 1 Powerconnector compatible with the Powersupply (ex. USB Terminal)
 - Wiring stuff
 - nice Enclousure
